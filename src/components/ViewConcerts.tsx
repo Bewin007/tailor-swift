@@ -10,7 +10,8 @@ type concertType =     {
       venue: string,
       date: string,
       country: string,
-      continent: string
+      continent: string,
+      availableTickets:string
     }
 type summaryType = {
     continent:string
@@ -30,12 +31,18 @@ const ViewConcerts:React.FC = ()=>{
         { continent: "South America", count: 0, backgroundColor: "#FFE0B2", color: "#E65100" }
     ])
     const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true'
-    const username = sessionStorage.getItem('username')
     
     const navigate = useNavigate()
     useEffect(()=>{
         axios.get('http://localhost:8000/concerts')
-        .then((res)=>{setConcerts(res.data);return res.data})
+        .then((res)=>{
+            let data = res.data.filter((ele:any)=>new Date (ele.date) > new Date())
+            // let data = res.data.map((ele:any)=>console.log(ele.date))
+
+            console.log(data)
+            setConcerts(data);
+            
+            })
         .catch((err)=>console.log(err.response))
         
 
@@ -72,6 +79,13 @@ const ViewConcerts:React.FC = ()=>{
             navigate('/login')
         }
     }
+    // const validToSell = (ele:any) =>{
+    //     if (new Date (ele.date) > new Date()){
+    //         return true
+    //     }
+    //     else
+    //         return false
+    // }
     return (
         <>
             <h1 className="d-flex justify-content-center">View Concerts</h1>
@@ -103,7 +117,10 @@ const ViewConcerts:React.FC = ()=>{
                             <h5>Venue: {ele.venue}</h5>
                             <h5>Date: {ele.date}</h5>
                             <h5>Country: {ele.country}</h5>
-                            <button onClick={()=> handleBuyTicket(ele)} className="btn btn-primary mb-3">Buy Ticket</button>
+                            <h5>Available Tickets: {ele.availableTickets}</h5>
+                            
+                            {Number(ele.availableTickets )>0 ? <button onClick={()=> handleBuyTicket(ele)} className="btn btn-primary mb-3">Buy Ticket</button>:<button className="btn btn-danger" disabled>soled out</button>}
+                            {/* {validToSell() && } */}
                         </div>
                     )
                  })

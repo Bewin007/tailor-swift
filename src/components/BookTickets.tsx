@@ -29,7 +29,8 @@ type concertType =     {
       venue: string,
       date: string,
       country: string,
-      continent: string
+      continent: string,
+      availableTickets:string
     }
 const BookTickets:React.FC = ()=>{
     const {concertid}  = useParams()
@@ -81,7 +82,12 @@ const BookTickets:React.FC = ()=>{
 
             case 'numberOfTicket':{
                 if (Number(value) > 0){
-                    setFormDataError({...formDataError,numberOfTicket:''})
+
+                    if (Number(value) >= Number(concert?.availableTickets)+1)
+                        setFormDataError({...formDataError,numberOfTicket:`we have only ${concert?.availableTickets} available`})
+
+                    else
+                        setFormDataError({...formDataError,numberOfTicket:''})
                 }
                 else{
                     setFormDataError({...formDataError,numberOfTicket:'Enter the valid count'})
@@ -130,7 +136,6 @@ const BookTickets:React.FC = ()=>{
 
         let error_Verify = Object.values(formDataError).some((ele) => {
             if (ele!==''){
-                console.log(ele)
                 return true
             }
             else
@@ -140,10 +145,26 @@ const BookTickets:React.FC = ()=>{
             alert('you have some unfinished data')
 
         }else{
-            // console.log(formData)
-            axios.post('http://localhost:8000/booking',formData).then((ele:any)=>setSucess(`Booking Sucessful \n your id is: ${ele.data.id}`)).catch(()=>setError('Something went wrong please try after some time'))
+            if (Number(formData.numberOfTicket) >= Number(concert?.availableTickets)+1)
+                setFormDataError({...formDataError,numberOfTicket:`we have only ${concert?.availableTickets} available`})
+
+            else{
+            let payload:any = {...concert}
+            payload.availableTickets = String(Number(payload.availableTickets)-Number(formData.numberOfTicket))
+            axios.put('http://localhost:8000/concerts/'+concertid,payload).then((ele)=>{
+                axios.post('http://localhost:8000/booking',formData).then((ele:any)=>setSucess(`Booking Sucessful \n your id is: ${ele.data.id}`))
+                .catch(()=>setError('Something went wrong please try after some time'))
+
+
+            }).catch(()=>setError('Something went wrong please try after some time'))
+            setConcert(payload)
+            setTimeout(() => {
+                navigate('/view-tickets')
+                
+            }, 3000);
+    }
+
         }   
-        console.log(error_Verify)
     }
 
     return (
@@ -156,6 +177,7 @@ const BookTickets:React.FC = ()=>{
                             <h5>Venue: {concert.venue}</h5>
                             <h5>Date: {concert.date}</h5>
                             <h5>Country: {concert.country}</h5>
+                            <h5>No of tickets: {concert.availableTickets}</h5>
             </div>}
             <div className="container">
                 <form className="form" onSubmit={handleSubmit}>

@@ -84,7 +84,7 @@ const ViewTickets:React.FC = ()=>{
                             <h5>Artist: {ele.concert.artist}</h5>
                             <h5>Venue: {ele.concert.venue}</h5>
                             <h5>Date: {ele.concert.date}</h5>
-                            <h5>ph no:{ele.booking.phoneNumber}</h5>
+                            {/* <h5>ph no:{ele.booking.phoneNumber}</h5> */}
                             <h5>Booking Date: {ele.booking.date}</h5>
                             <h5>No of Ticket: {ele.booking.numberOfTicket}</h5>
                             
