@@ -28,12 +28,14 @@ type dataType = {
 }
 const ViewTickets:React.FC = ()=>{
     const [Bookings,setBookings] = useState<dataType[]>([])
+    const username = sessionStorage.getItem('username')
+    
     const [sucess,setSucess] = useState<string>()
     const [error,setError] = useState<string>()
     const navigate = useNavigate()
     
     const fetch = async() =>{
-        let bookingResponse = await axios.get('http://localhost:8000/booking')
+        let bookingResponse = await axios.get('http://localhost:8000/booking/?email='+username)
 
 
         if(bookingResponse.status === 200){
@@ -50,32 +52,12 @@ const ViewTickets:React.FC = ()=>{
         else{
             console.log(bookingResponse.data)
         }
-        // console.log(booking.data)
-        // .then((res)=>{
-        //     let temp:any = []
-            
-        //     res.data.map((ele:any)=>{
-        //         axios.get('http://localhost:8000/concerts/?id='+ele.concertid)
-        //         .then((con_res)=>{
-        //             temp.push({
-        //                 concert:con_res.data[0],
-        //                 booking: ele
-        //             })
-        //         })
-
-        //     })
-        //     console.log(temp[0])
-        //     setBookings(temp)
-        // })
-        // .catch((ele)=>console.log(ele))
     }
     useEffect(()=>{
         fetch()
     },[])
     
-    const viewConcert = ()=>{
-        
-    }
+
     // console.log(Bookings)
     return (
         <>
@@ -107,7 +89,7 @@ const ViewTickets:React.FC = ()=>{
                             <h5>No of Ticket: {ele.booking.numberOfTicket}</h5>
                             
                             
-                            <button onClick={()=> viewConcert} className="btn btn-primary mb-3">View Concert</button>
+                            {/* <button onClick={()=> viewConcert} className="btn btn-primary mb-3">View Concert</button> */}
                         </div>
                     )
                  })

@@ -4,21 +4,21 @@ import { useNavigate, useParams } from "react-router-dom"
 
 type formDataType = {
     concertid:string | undefined,
-    userName : string,
-    phoneNumber: string,
-    email: string,
+    // userName : string,
+    // phoneNumber: string,
+    email: string | undefined | null,
     // password: string,
     numberOfTicket : number,
     date: string,
 }
 
 type formDataErrorType = {
-    userName : string,
-    phoneNumber: string,
-    email: string,
+    // userName : string,
+    // phoneNumber: string,
+    // email: string,
     // password: string,
     numberOfTicket : string,
-    date: string,
+    // date: string,
 }
 
 type concertType =     {
@@ -34,10 +34,11 @@ type concertType =     {
 const BookTickets:React.FC = ()=>{
     const {concertid}  = useParams()
 
-
+    const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true'
+    const username = sessionStorage.getItem('username')
     
-    const [formData,setFormData] = useState<formDataType>({concertid:concertid, userName:'',numberOfTicket:0,phoneNumber:'',email:'',date:new Date().toISOString().split("T")[0]})
-    const [formDataError,setFormDataError] = useState<formDataErrorType>({userName:'',numberOfTicket:'',phoneNumber:'',email:'',date:''})
+    const [formData,setFormData] = useState<formDataType>({concertid:concertid,numberOfTicket:0,email:username,date:new Date().toISOString().split("T")[0]})
+    const [formDataError,setFormDataError] = useState<formDataErrorType>({numberOfTicket:''})
     const [concert,setConcert] = useState<concertType>()
     const [sucess,setSucess] = useState<string>()
     const [error,setError] = useState<string>()
@@ -47,7 +48,8 @@ const BookTickets:React.FC = ()=>{
         axios.get('http://localhost:8000/concerts/?id='+concertid)
         .then((res)=>{
             if (res.data !=='' && new Date (res.data[0].date) > new Date() ){
-                setConcert(res.data)
+                setConcert(res.data[0])
+                // console.log(res.data[0])
             }
             else{
                 // console.log(res.data[0])
@@ -67,15 +69,15 @@ const BookTickets:React.FC = ()=>{
         const usernameRegex = /[A-Za-z]{3,}/
         const cityRegex = /[A-Za-z]{2,}/
         switch(name){
-            case 'userName':{
-                if (usernameRegex.test(value)){
-                    setFormDataError({...formDataError,userName:''})
-                }
-                else{
-                    setFormDataError({...formDataError,userName:'Name should contain only Letter and space and Atleast 3 character long'})
-                }
-                break;
-            }
+            // case 'userName':{
+            //     if (usernameRegex.test(value)){
+            //         setFormDataError({...formDataError,userName:''})
+            //     }
+            //     else{
+            //         setFormDataError({...formDataError,userName:'Name should contain only Letter and space and Atleast 3 character long'})
+            //     }
+            //     break;
+            // }
 
             case 'numberOfTicket':{
                 if (Number(value) > 0){
@@ -86,31 +88,31 @@ const BookTickets:React.FC = ()=>{
                 }
                 break;
             }
-            case 'phoneNumber':{
-                const phoneNumberRegex = /\d{10}/
-                // console.log(phoneNumberRegex.test(value))
+            // case 'phoneNumber':{
+            //     const phoneNumberRegex = /\d{10}/
+            //     // console.log(phoneNumberRegex.test(value))
 
-                if (phoneNumberRegex.test(value)){
-                    setFormDataError({...formDataError,phoneNumber:''})
+            //     if (phoneNumberRegex.test(value)){
+            //         setFormDataError({...formDataError,phoneNumber:''})
 
-                }
-                else{
-                    setFormDataError({...formDataError,phoneNumber:'Enter the valid Phone Number'})
-                }
-                break;
-            }
+            //     }
+            //     else{
+            //         setFormDataError({...formDataError,phoneNumber:'Enter the valid Phone Number'})
+            //     }
+            //     break;
+            // }
 
-            case 'email':{
-                // console.log(1)
-                const emailRegex = /[\w.-]+@[\w.-]+\.[\w]{2,}/
-                if (emailRegex.test(value)){
-                    setFormDataError({...formDataError,[name]:''})
-                }
-                else{
-                    setFormDataError({...formDataError,[name]:'Enter the valid email'})
-                }
-                break;
-            }
+            // case 'email':{
+            //     // console.log(1)
+            //     const emailRegex = /[\w.-]+@[\w.-]+\.[\w]{2,}/
+            //     if (emailRegex.test(value)){
+            //         setFormDataError({...formDataError,[name]:''})
+            //     }
+            //     else{
+            //         setFormDataError({...formDataError,[name]:'Enter the valid email'})
+            //     }
+            //     break;
+            // }
         }
     }
 
@@ -148,13 +150,17 @@ const BookTickets:React.FC = ()=>{
         <>
 
             <h1>BookTickets</h1>
-            <div className="container">
-
-            </div>
+            {concert && <div className="container">
+                            <h3>{concert.concertName}</h3>
+                            <h5>Artist: {concert.artist}</h5>
+                            <h5>Venue: {concert.venue}</h5>
+                            <h5>Date: {concert.date}</h5>
+                            <h5>Country: {concert.country}</h5>
+            </div>}
             <div className="container">
                 <form className="form" onSubmit={handleSubmit}>
 
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label htmlFor="userName" className="form-label">User Name</label>
                         <input type="text" value={formData.userName} className="form-control" id="userName" name="userName" onChange={handleChange}/>
                         <div >{formDataError.userName}</div>
@@ -164,13 +170,13 @@ const BookTickets:React.FC = ()=>{
                         <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
                         <input  type="text" value={formData.phoneNumber} className="form-control" id="phoneNumber" name="phoneNumber" onChange={handleChange}/>
                         <div >{formDataError.phoneNumber}</div>
-                    </div>
-
+                    </div> */}
+{/* 
                     <div className="form-group">
                         <label htmlFor="email" className="form-label">email</label>
                         <input type="text" value={formData.email} className="form-control" id="email" name="email" onChange={handleChange}/>
                         <div >{formDataError.email}</div>
-                    </div>
+                    </div> */}
 
                     <div className="form-group">
                         <label htmlFor="numberOfTicket" className="form-label">numberOfTicket</label>
